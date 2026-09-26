@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MTN ID Card - OFFLINE - No Data Needed</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFCC00">
 <style>
 :root{--blue:#0E4D9C;--yellow:#FFCC00;--green:#1E7A3A;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
@@ -333,6 +335,11 @@ async function saveBoth(){
 }
 const cur=JSON.parse(localStorage.getItem('mtn_id_current_offline')||'null');if(cur)openDash(cur);
 drawBars();drawQR();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
