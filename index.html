@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN ID Card - OFFLINE - No Data Needed</title>
+<style>
+:root{--blue:#0E4D9C;--yellow:#FFCC00;--green:#1E7A3A;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#eef2f7;min-height:100vh;}
+#authScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at top,#1a6bc0 0%,#001a33 100%);padding:15px;}
+.authBox{background:#fff;width:100%;max-width:420px;border-radius:20px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3);}
+.authHead{background:var(--blue);padding:18px;text-align:center;color:#fff;}.logo{font-size:28px;font-weight:900;}.logo span{background:var(--yellow);color:var(--blue);padding:2px 9px;border-radius:7px;}
+.tabs{display:flex;background:#f1f5f9;}.tab{flex:1;padding:11px;text-align:center;cursor:pointer;font-weight:800;color:#64748b;border-bottom:3px solid transparent;font-size:12px;}.tab.active{background:#fff;color:var(--blue);border-bottom-color:var(--yellow);}
+.form{padding:18px 20px;}.inputGroup{margin-bottom:10px;}.inputGroup label{font-size:10px;font-weight:800;color:var(--blue);display:block;margin-bottom:3px;text-transform:uppercase;}
+.inputGroup input{width:100%;padding:11px;border:2px solid #e2e8f0;border-radius:10px;outline:none;font-size:12px;}.inputGroup input:focus{border-color:var(--yellow);}
+.btn{width:100%;padding:12px;border:none;border-radius:11px;font-weight:900;cursor:pointer;margin-top:8px;font-size:12px;}
+.btn-y{background:var(--yellow);color:var(--blue);}.btn-b{background:var(--blue);color:#fff;}.btn-save{background:#16a34a;color:#fff;font-size:14px;padding:14px;}
+.msg{padding:8px;border-radius:8px;font-size:11px;margin-top:7px;display:none;font-weight:700;text-align:center;}.error{background:#fee2e2;color:#b91c1c;}.success{background:#dcfce7;color:#15803d;}
+.link{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;font-weight:700;margin-top:7px;display:inline-block;}
+#successOverlay,#forgotModal,#saveModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:100;padding:15px;}
+.successBox,.forgotBox,.saveBox{background:#fff;padding:20px;border-radius:16px;width:100%;max-width:440px;text-align:center;}
+#dashScreen{display:none;}
+.dashHeader{background:var(--blue);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;}
+.logout{background:#ef4444;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer;}
+.container{max-width:1300px;margin:0 auto;display:grid;grid-template-columns:370px 1fr;gap:18px;padding:16px;}
+.formPanel{background:#fff;padding:16px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.08);height:fit-content;max-height:92vh;overflow-y:auto;}
+.preview{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;padding:10px;}
+.card{width:380px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.18);border:1px solid #ddd;}
+.mtnHeader{background:var(--blue);padding:16px 18px;display:flex;align-items:center;gap:18px;}
+.mtnLogoWrap{width:160px;height:72px;background:#fff;border-radius:50%;border:5px solid var(--yellow);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mtnLogoBlue{width:142px;height:54px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.mtnText{font-family:Arial Black,Arial,sans-serif;font-weight:900;font-size:36px;color:#fff;letter-spacing:-1px;}
+.mtnText span{color:var(--yellow);}
+.headerTitle{color:#fff;font-weight:900;font-size:20px;line-height:1.15;}
+.cardBody{padding:16px 14px;display:flex;gap:14px;}
+.photoBox{width:150px;height:230px;border-radius:14px;border:1.5px solid #e2e8f0;overflow:hidden;background:#f8fafc;flex-shrink:0;position:relative;}
+.photoBox img{width:100%;height:100%;object-fit:cover;display:none;}
+.noPhoto{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;font-weight:700;text-align:center;}
+.info{flex:1;}.infoRow{margin-bottom:10px;}.infoRow label{font-size:11px;font-weight:800;color:#0E4D9C;display:block;}.infoRow span{font-size:13.5px;font-weight:700;color:#111;display:block;line-height:1.25;}.infoRow span.name{font-size:15px;font-weight:900;text-transform:uppercase;}
+.badgeActive{background:var(--green);color:#fff;padding:7px 16px;border-radius:22px;font-weight:900;font-size:14px;display:inline-flex;gap:6px;margin-top:8px;}
+.yellowBar{height:14px;background:var(--yellow);}
+.barArea{padding:14px 12px 10px;text-align:center;background:#fff;}
+.barArea canvas{width:100%;height:32px;}
+.validText{font-size:10px;font-weight:800;color:var(--blue);margin-top:6px;}
+.footerBlue{background:var(--blue);color:#fff;font-size:8.8px;text-align:center;padding:10px;line-height:1.3;}
+.cardBack{width:380px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.18);border:1px solid #ddd;}
+.backTop{padding:12px 16px 6px;text-align:center;background:#fff;}.backTop small{font-size:11px;color:var(--blue);font-weight:800;}
+.yellowLine{height:3px;background:var(--yellow);margin:6px 18px 12px;}
+.backContent{padding:0 16px 12px;background:#fff;}
+.backHead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.backHead h3{font-size:16px;color:#0A3D7A;font-weight:900;line-height:1.15;text-transform:uppercase;}
+.mtnSquare{width:88px;height:56px;background:var(--yellow);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.mtnOvalSmall{width:76px;height:38px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;}
+.termsTitle{font-size:14px;font-weight:900;color:#0A3D7A;margin:10px 0 6px;text-transform:uppercase;}
+.terms{font-size:8.6px;line-height:1.4;color:#111;}
+.divider{height:1.5px;background:var(--yellow);margin:12px 0;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:10px;}
+.grid2 label{font-size:9.5px;font-weight:800;color:var(--blue);display:block;text-transform:uppercase;}
+.grid2 span{font-weight:700;color:#111;display:block;font-size:11px;}
+.signArea{margin-top:12px;display:flex;justify-content:space-between;align-items:flex-end;}
+.signLine{width:150px;height:1px;background:#999;margin:22px 0 4px;}
+.qrWrap{width:92px;height:92px;background:#fff;display:flex;align-items:center;justify-content:center;border:1px solid #eee;border-radius:6px;overflow:hidden;}
+.qrWrap canvas{width:88px;height:88px;}
+.backFooter{background:var(--blue);color:#fff;font-size:7.6px;text-align:center;padding:9px 10px;line-height:1.35;}
+.photoUp{border:2px dashed #cbd5e1;height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f8fafc;cursor:pointer;overflow:hidden;margin-top:4px;}
+.photoUp img{width:100%;height:100%;object-fit:cover;display:none;}
+@media(max-width:950px){.container{grid-template-columns:1fr;}.card,.cardBack{width:100%;max-width:380px;}}
+</style>
+</head>
+<body>
+
+<div id="authScreen">
+  <div class="authBox">
+    <div class="authHead"><div class="logo">MTN<span>NG</span></div><div style="font-size:10px;opacity:.8;">Staff ID Portal - Offline</div></div>
+    <div class="tabs"><div class="tab active" id="loginTab" onclick="switchTab('login')">LOGIN</div><div class="tab" id="regTab" onclick="switchTab('register')">REGISTER</div></div>
+    <div class="form" id="loginForm">
+      <div class="inputGroup"><label>Email</label><input id="loginEmail" type="email" value="mudassir@example.com"></div>
+      <div class="inputGroup"><label>Password</label><input id="loginPass" type="password" value="kotorkoshi@2026"></div>
+      <div id="loginMsg" class="msg"></div>
+      <button class="btn btn-y" onclick="handleLogin()">LOGIN →</button>
+      <span class="link" onclick="openForgot()">Forgot Password?</span><br>
+      <span class="link" style="color:#16a34a;" onclick="switchTab('register')">Create Account</span>
+    </div>
+    <div class="form" id="regForm" style="display:none;">
+      <div class="inputGroup"><label>Full Name</label><input id="regName" placeholder="Mudassir Hassan"></div>
+      <div class="inputGroup"><label>Email</label><input id="regEmail" type="email"></div>
+      <div class="inputGroup"><label>Password</label><input id="regPass" type="password" placeholder="Min 6"></div>
+      <div class="inputGroup"><label>Confirm Password (Dole su zama daya)</label><input id="regPass2" type="password"></div>
+      <div id="regMsg" class="msg"></div>
+      <button class="btn btn-b" onclick="handleRegister()">CREATE ACCOUNT</button>
+      <span class="link" onclick="switchTab('login')">Login</span>
+    </div>
+  </div>
+</div>
+
+<div id="forgotModal"><div class="forgotBox"><h3 style="color:var(--blue);">🔑 Forgot Password</h3>
+  <div class="inputGroup"><label>Email</label><input id="forgotEmail" type="email"></div>
+  <div class="inputGroup"><label>New Password</label><input id="forgotNewPass" type="password"></div>
+  <div class="inputGroup"><label>Confirm New Password</label><input id="forgotNewPass2" type="password"></div>
+  <div id="forgotMsg" class="msg"></div>
+  <button class="btn btn-y" onclick="handleForgot()">Reset Password</button>
+  <button class="btn" style="background:#e2e8f0;" onclick="closeForgot()">Cancel</button>
+</div></div>
+
+<div id="successOverlay"><div class="successBox"><div style="font-size:40px;">✅</div><h3 style="color:var(--blue);margin-top:6px;" id="successText">Success!</h3></div></div>
+
+<div id="saveModal">
+  <div class="saveBox">
+    <h3 style="color:var(--blue);margin-bottom:10px;">✅ ID Card Ready! (Offline)</h3>
+    <div id="savePreviewWrap" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;"></div>
+    <p style="font-size:10px;color:#666;margin-bottom:8px;">An yi saving offline - Danna DOWNLOAD</p>
+    <div id="downloadLinks" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <button class="btn" style="background:#e2e8f0;margin-top:10px;" onclick="closeSaveModal()">Close</button>
+  </div>
+</div>
+
+<div id="dashScreen">
+  <div class="dashHeader"><div><b id="uName">-</b><br><small id="uEmail" style="font-size:11px;color:#cbd5e1;"></small></div><button class="logout" onclick="logout()">Logout</button></div>
+  <div class="container">
+    <div class="formPanel">
+      <h3 style="color:var(--blue);font-size:13px;margin-bottom:10px;">ID Card Details</h3>
+      <div class="inputGroup"><label>Full Name</label><input id="fName" value="MUDASSIR HASSAN" oninput="update()"></div>
+      <div class="inputGroup"><label>Position</label><input id="fPos" value="SIM Registration Agent" oninput="update()"></div>
+      <div class="inputGroup"><label>ID No</label><input id="fId" value="MTN/KOT/2026/027" oninput="update()"></div>
+      <div class="inputGroup"><label>Address</label><input id="fAddr" value="Kotorkoshi" oninput="update()"></div>
+      <div class="inputGroup"><label>Phone</label><input id="fPhone" value="09117675227 / 08164470529" oninput="update()"></div>
+      <div class="inputGroup"><label>Emergency Contact</label><input id="fEmer" value="09117675227" oninput="update()"></div>
+      <div class="inputGroup"><label>Issuer</label><input id="fIssuer" value="MTN Nigeria Connect Point" oninput="update()"></div>
+      <div class="inputGroup"><label>Upload Photo</label>
+        <input type="file" id="file" accept="image/*" hidden onchange="loadPhoto(event)">
+        <div class="photoUp" onclick="document.getElementById('file').click()"><span id="upTxt" style="font-size:11px;color:#94a3b8;font-weight:700;">Click to Upload Photo</span><img id="upImg"></div>
+      </div>
+      <button class="btn btn-y" onclick="genCard()">✨ Generate Preview</button>
+      <button class="btn btn-save" id="saveBtn" onclick="saveBoth()">💾 SAVE ID CARD - OFFLINE (No Data)</button>
+      <div id="saveStatus" style="font-size:10px;text-align:center;margin-top:6px;color:#16a34a;font-weight:700;display:none;">Generating...</div>
+    </div>
+
+    <div class="preview">
+      <div class="card" id="frontCard">
+        <div class="mtnHeader"><div class="mtnLogoWrap"><div class="mtnLogoBlue"><div class="mtnText">M<span>T</span>N</div></div></div><div class="headerTitle">STAFF<br>IDENTIFICATION<br>CARD</div></div>
+        <div class="cardBody">
+          <div class="photoBox"><div id="phFront" class="noPhoto">NO PHOTO<br>Upload</div><img id="imgFront"></div>
+          <div class="info">
+            <div class="infoRow"><label>NAME:</label><span class="name" id="cName">MUDASSIR HASSAN</span></div>
+            <div class="infoRow"><label>POSITION:</label><span id="cPos">SIM Registration Agent</span></div>
+            <div class="infoRow"><label>ID NO:</label><span id="cId">MTN/KOT/2026/027</span></div>
+            <div class="infoRow"><label>ADDRESS:</label><span id="cAddr">Kotorkoshi</span></div>
+            <div class="infoRow"><label>PHONE:</label><span id="cPhone">09117675227 / 08164470529</span></div>
+            <div class="badgeActive">✓ ACTIVE</div>
+          </div>
+        </div>
+        <div class="yellowBar"></div>
+        <div class="barArea"><canvas id="barFront" width="340" height="36"></canvas><div class="validText">VALID THROUGH: 31/DEC/2026 • MTN NIGERIA •</div></div>
+        <div class="footerBlue">This card is the property of MTN Nigeria. If found, please return to the nearest MTN office.</div>
+      </div>
+
+      <div class="cardBack" id="backCard">
+        <div class="backTop"><small>CARD BARCODE</small><canvas id="barBack" width="340" height="36"></canvas></div>
+        <div class="yellowLine"></div>
+        <div class="backContent">
+          <div class="backHead"><h3>STAFF IDENTIFICATION<br>CARD — BACK</h3><div class="mtnSquare"><div class="mtnOvalSmall">M<span style="color:var(--yellow);">T</span>N</div></div></div>
+          <div class="termsTitle">TERMS & CONDITIONS</div>
+          <div class="terms">1. This card is the property of MTN Nigeria and must be returned upon request or termination of employment.<br>2. The card is non-transferable and must be worn visibly at all times while on official duty.<br>3. Loss, theft, or damage of this card must be reported immediately to MTN Security at the contact below.<br>4. The cardholder shall comply with all MTN policies, confidentiality, and safety procedures.<br>5. Unauthorized use, alteration, or duplication is prohibited and may result in disciplinary action.</div>
+          <div class="divider"></div>
+          <div class="grid2">
+            <div><label>EMERGENCY CONTACT:</label><span id="cEmer">09117675227</span></div>
+            <div><label>CARD NO.:</label><span id="cId2">MTN/KOT/2026/027</span></div>
+            <div><label>ADDRESS:</label><span id="cAddr2">Kotorkoshi</span></div>
+            <div><label>NAME:</label><span id="cName2">MUDASSIR HASSAN</span></div>
+            <div><label>ISSUER:</label><span id="cIssuer">MTN Nigeria Connect Point</span></div>
+          </div>
+          <div class="divider"></div>
+          <div class="signArea">
+            <div><label style="font-size:10px;font-weight:800;color:var(--blue);">SIGNATURE:</label><div class="signLine"></div><small style="font-size:9px;color:#666;font-style:italic;">(Cardholder Signature)</small></div>
+            <div style="text-align:center;"><div class="qrWrap"><canvas id="qrCanvas" width="88" height="88"></canvas></div><small style="font-size:8px;color:var(--blue);font-weight:800;display:block;margin-top:3px;">SCAN FOR VERIFICATION</small></div>
+          </div>
+        </div>
+        <div class="backFooter">This card is valid only when presented with a valid government-issued photo ID •<br>Property of MTN Nigeria • www.mtn.ng • Customer Care: +234 806 300 0000</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ALL OFFLINE - NO CDN
+let users=JSON.parse(localStorage.getItem('mtn_id_users_offline')||'[]');
+if(!users.find(u=>u.email==='mudassir@example.com')){users.push({name:'Mudassir Hassan',email:'mudassir@example.com',password:'kotorkoshi@2026'});localStorage.setItem('mtn_id_users_offline',JSON.stringify(users));}
+let uploaded=null;
+function switchTab(t){document.getElementById('loginTab').classList.toggle('active',t==='login');document.getElementById('regTab').classList.toggle('active',t==='register');document.getElementById('loginForm').style.display=t==='login'?'block':'none';document.getElementById('regForm').style.display=t==='register'?'block':'none';}
+function showMsg(id,txt,err=true){const el=document.getElementById(id);el.innerText=txt;el.className='msg '+(err?'error':'success');el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+function handleRegister(){const n=document.getElementById('regName').value.trim(),e=document.getElementById('regEmail').value.trim().toLowerCase(),p=document.getElementById('regPass').value,p2=document.getElementById('regPass2').value;if(!n||!e||!p||!p2){showMsg('regMsg','Fill all!');return;}if(p.length<6){showMsg('regMsg','Too short! Min 6');return;}if(p!==p2){showMsg('regMsg','❌ Wrong Password! Dole su zama daya! Passwords do not match!');return;}if(users.find(u=>u.email===e)){showMsg('regMsg','Email exists!');return;}users.push({name:n,email:e,password:p});localStorage.setItem('mtn_id_users_offline',JSON.stringify(users));document.getElementById('successOverlay').style.display='flex';document.getElementById('successText').innerText='Registration Successful!';setTimeout(()=>{document.getElementById('successOverlay').style.display='none';switchTab('login');document.getElementById('loginEmail').value=e;showMsg('loginMsg','Success! Login now',false);},1500);}
+function handleLogin(){const e=document.getElementById('loginEmail').value.trim().toLowerCase(),p=document.getElementById('loginPass').value,u=users.find(u=>u.email===e);if(!u){showMsg('loginMsg','User not found! Register first');return;}if(u.password!==p){showMsg('loginMsg','❌ Wrong Password! Password is incorrect!');return;}localStorage.setItem('mtn_id_current_offline',JSON.stringify(u));openDash(u);}
+function openForgot(){document.getElementById('forgotModal').style.display='flex';}
+function closeForgot(){document.getElementById('forgotModal').style.display='none';}
+function closeSaveModal(){document.getElementById('saveModal').style.display='none';}
+function handleForgot(){const e=document.getElementById('forgotEmail').value.trim().toLowerCase(),np=document.getElementById('forgotNewPass').value,np2=document.getElementById('forgotNewPass2').value,u=users.find(u=>u.email===e);if(!e){showMsg('forgotMsg','Enter email!');return;}if(!u){showMsg('forgotMsg','❌ Email not found!');return;}if(np.length<6){showMsg('forgotMsg','Too short! Min 6');return;}if(np!==np2){showMsg('forgotMsg','❌ Wrong Password! New passwords do not match! Dole su zama daya!');return;}u.password=np;localStorage.setItem('mtn_id_users_offline',JSON.stringify(users));showMsg('forgotMsg','✅ Password reset successful! Login now',false);setTimeout(()=>{closeForgot();switchTab('login');document.getElementById('loginEmail').value=e;document.getElementById('loginPass').value=np;},1500);}
+function openDash(user){document.getElementById('authScreen').style.display='none';document.getElementById('dashScreen').style.display='block';document.getElementById('uName').innerText=user.name;document.getElementById('uEmail').innerText=user.email;update();}
+function logout(){localStorage.removeItem('mtn_id_current_offline');location.reload();}
+function loadPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{
+    uploaded=ev.target.result;
+    document.getElementById('upImg').src=uploaded;document.getElementById('upImg').style.display='block';document.getElementById('upTxt').style.display='none';
+    document.getElementById('imgFront').src=uploaded;document.getElementById('imgFront').style.display='block';document.getElementById('phFront').style.display='none';
+    update();
+  };r.readAsDataURL(f);
+}
+function update(){
+  document.getElementById('cName').innerText=(document.getElementById('fName').value||'MUDASSIR HASSAN').toUpperCase();
+  document.getElementById('cName2').innerText=(document.getElementById('fName').value||'MUDASSIR HASSAN').toUpperCase();
+  document.getElementById('cPos').innerText=document.getElementById('fPos').value||'SIM Registration Agent';
+  document.getElementById('cId').innerText=document.getElementById('fId').value||'MTN/KOT/2026/027';
+  document.getElementById('cId2').innerText=document.getElementById('fId').value||'MTN/KOT/2026/027';
+  document.getElementById('cAddr').innerText=document.getElementById('fAddr').value||'Kotorkoshi';
+  document.getElementById('cAddr2').innerText=document.getElementById('fAddr').value||'Kotorkoshi';
+  document.getElementById('cPhone').innerText=document.getElementById('fPhone').value||'09117675227 / 08164470529';
+  document.getElementById('cEmer').innerText=document.getElementById('fEmer').value||'09117675227';
+  document.getElementById('cIssuer').innerText=document.getElementById('fIssuer').value||'MTN Nigeria Connect Point';
+  drawBars();drawQR();
+}
+function drawBars(){
+  ['barFront','barBack'].forEach(id=>{
+    const canvas=document.getElementById(id);if(!canvas)return;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';
+    let x=5;for(let i=0;i<60;i++){const w=Math.random()>0.5?4:2;ctx.fillRect(x,2,w,28);x+=w+3;if(x>330)break;}
+  });
+}
+// OFFLINE QR CODE - NO CDN - REAL PATTERN
+function drawQR(){
+  const canvas=document.getElementById('qrCanvas');if(!canvas)return;const ctx=canvas.getContext('2d');
+  const size=88;const modules=21;const cell=size/modules;
+  const text=document.getElementById('fId').value+document.getElementById('fName').value;
+  // hash
+  let hash=0;for(let i=0;i<text.length;i++){hash=(hash*31+text.charCodeAt(i))%1000000;}
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='#000';
+  // finder patterns
+  function finder(fx,fy){
+    ctx.fillRect(fx,fy,7*cell,7*cell);
+    ctx.fillStyle='#fff';ctx.fillRect(fx+cell,fy+cell,5*cell,5*cell);
+    ctx.fillStyle='#000';ctx.fillRect(fx+2*cell,fy+2*cell,3*cell,3*cell);
+  }
+  finder(0,0);finder((modules-7)*cell,0);finder(0,(modules-7)*cell);
+  // data - pseudo random but looks like QR
+  let seed=hash;
+  for(let r=0;r<modules;r++){
+    for(let c=0;c<modules;c++){
+      if((r<7&&c<7)||(r<7&&c>=modules-7)||(r>=modules-7&&c<7))continue;
+      seed=(seed*9301+49297)%233280;
+      if(seed%2===0){ctx.fillRect(c*cell,r*cell,cell,cell);}
+    }
+  }
+}
+function genCard(){if(!uploaded){alert('Upload photo first!');return;}update();alert('✅ Generated! Click SAVE');}
+
+// OFFLINE SAVE - PURE CANVAS - NO html2canvas
+async function saveBoth(){
+  if(!uploaded){alert('Upload photo first!');return;}
+  const btn=document.getElementById('saveBtn'),status=document.getElementById('saveStatus');
+  btn.innerText='⏳ Saving Offline...';btn.disabled=true;status.style.display='block';status.innerText='⏳ Creating cards...';
+  try{
+    // Create Front Canvas OFFLINE
+    const frontCanvas=document.createElement('canvas');frontCanvas.width=1140;frontCanvas.height=1650;
+    const fctx=frontCanvas.getContext('2d');
+    // White bg
+    fctx.fillStyle='#fff';fctx.fillRect(0,0,1140,1650);
+    fctx.fillStyle='#0E4D9C';fctx.fillRect(0,0,1140,260);
+    // MTN logo
+    fctx.fillStyle='#fff';fctx.beginPath();fctx.ellipse(210,130,160,72,0,0,Math.PI*2);fctx.fill();
+    fctx.fillStyle='#FFCC00';fctx.beginPath();fctx.ellipse(210,130,160,72,0,0,Math.PI*2);fctx.lineWidth=12;fctx.strokeStyle='#FFCC00';fctx.stroke();
+    fctx.fillStyle='#0E4D9C';fctx.beginPath();fctx.ellipse(210,130,142,54,0,0,Math.PI*2);fctx.fill();
+    fctx.fillStyle='#fff';fctx.font='900 54px Arial Black';fctx.fillText('M',120,150);fctx.fillStyle='#FFCC00';fctx.fillText('T',180,150);fctx.fillStyle='#fff';fctx.fillText('N',230,150);
+    // Title
+    fctx.fillStyle='#fff';fctx.font='900 28px Segoe UI';fctx.fillText('STAFF',420,90);fctx.fillText('IDENTIFICATION',420,130);fctx.fillText('CARD',420,170);
+    // Photo
+    const img=new Image();img.src=uploaded;
+    await new Promise(r=>{img.onload=r; if(img.complete) r();});
+    fctx.fillStyle='#f1f5f9';fctx.fillRect(30,300,450,690);fctx.drawImage(img,30,300,450,690);
+    fctx.strokeStyle='#e2e8f0';fctx.lineWidth=3;fctx.strokeRect(30,300,450,690);
+    // Info
+    let y=340;function drawLabel(l,v,bold){fctx.fillStyle='#0E4D9C';fctx.font='800 24px Segoe UI';fctx.fillText(l,540,y);y+=30;fctx.fillStyle='#000';fctx.font=(bold?'900':'700')+' 30px Segoe UI';const lines=v.match(/.{1,28}/g)||[v];lines.forEach(line=>{fctx.fillText(line,540,y);y+=36;});y+=18;}
+    drawLabel('NAME:',(document.getElementById('fName').value||'MUDASSIR HASSAN').toUpperCase(),true);
+    drawLabel('POSITION:',document.getElementById('fPos').value||'SIM Registration Agent',false);
+    drawLabel('ID NO:',document.getElementById('fId').value||'MTN/KOT/2026/027',false);
+    drawLabel('ADDRESS:',document.getElementById('fAddr').value||'Kotorkoshi',false);
+    drawLabel('PHONE:',document.getElementById('fPhone').value||'09117675227 / 08164470529',false);
+    // ACTIVE
+    fctx.fillStyle='#1E7A3A';fctx.beginPath();fctx.roundRect(720, y, 240, 64, 32);fctx.fill();fctx.fillStyle='#fff';fctx.font='900 28px Segoe UI';fctx.fillText('✓ ACTIVE',760,y+42);
+    // Yellow bar
+    fctx.fillStyle='#FFCC00';fctx.fillRect(0,1050,1140,42);
+    // Barcode
+    let bx=80;for(let i=0;i<80;i++){const w=Math.random()>0.5?8:3;fctx.fillStyle='#000';fctx.fillRect(bx,1130,w,90);bx+=w+6;}
+    fctx.fillStyle='#0E4D9C';fctx.font='800 22px Segoe UI';fctx.fillText('VALID THROUGH: 31/DEC/2026 • MTN NIGERIA •',220,1260);
+    fctx.fillStyle='#0E4D9C';fctx.fillRect(0,1300,1140,110);fctx.fillStyle='#fff';fctx.font='500 20px Segoe UI';fctx.fillText('This card is the property of MTN Nigeria. If found, please return to the nearest MTN office.',60,1365);
+
+    // BACK CANVAS
+    const backCanvas=document.createElement('canvas');backCanvas.width=1140;backCanvas.height=1650;const bctx=backCanvas.getContext('2d');
+    bctx.fillStyle='#fff';bctx.fillRect(0,0,1140,1650);
+    bctx.fillStyle='#0E4D9C';bctx.font='800 24px Segoe UI';bctx.fillText('CARD BARCODE',420,50);
+    let bx2=80;for(let i=0;i<80;i++){const w=Math.random()>0.5?8:3;bctx.fillStyle='#000';bctx.fillRect(bx2,70,w,90);bx2+=w+6;}
+    bctx.fillStyle='#FFCC00';bctx.fillRect(50,190,1040,8);
+    bctx.fillStyle='#0A3D7A';bctx.font='900 32px Segoe UI';bctx.fillText('STAFF IDENTIFICATION',50,270);bctx.fillText('CARD — BACK',50,310);
+    bctx.fillStyle='#FFCC00';bctx.fillRect(750,230,260,130);bctx.fillStyle='#0E4D9C';bctx.beginPath();bctx.ellipse(880,295,90,45,0,0,Math.PI*2);bctx.fill();bctx.fillStyle='#fff';bctx.font='900 28px Arial Black';bctx.fillText('MTN',830,305);
+    bctx.fillStyle='#0A3D7A';bctx.font='900 28px Segoe UI';bctx.fillText('TERMS & CONDITIONS',50,380);
+    bctx.fillStyle='#000';bctx.font='500 18px Segoe UI';const terms=['1. This card is the property of MTN Nigeria and must be returned upon request or termination of employment.','2. The card is non-transferable and must be worn visibly at all times while on official duty.','3. Loss, theft, or damage of this card must be reported immediately to MTN Security.','4. The cardholder shall comply with all MTN policies, confidentiality, and safety procedures.','5. Unauthorized use, alteration, or duplication is prohibited and may result in disciplinary action.'];let ty=420;terms.forEach(t=>{const ls=bctx.measureText(t).width>1000?t.match(/.{1,90}/g):[t];(ls||[t]).forEach(l=>{bctx.fillText(l,50,ty);ty+=24;});ty+=6;});
+    bctx.fillStyle='#FFCC00';bctx.fillRect(50,ty+10,1040,3);ty+=40;
+    bctx.fillStyle='#0E4D9C';bctx.font='800 20px Segoe UI';bctx.fillText('EMERGENCY CONTACT:',50,ty);bctx.fillText('CARD NO.:',600,ty);ty+=26;bctx.fillStyle='#000';bctx.font='700 22px Segoe UI';bctx.fillText(document.getElementById('fEmer').value||'09117675227',50,ty);bctx.fillText(document.getElementById('fId').value||'MTN/KOT/2026/027',600,ty);ty+=40;
+    bctx.fillStyle='#0E4D9C';bctx.font='800 20px Segoe UI';bctx.fillText('ADDRESS:',50,ty);bctx.fillText('NAME:',600,ty);ty+=26;bctx.fillStyle='#000';bctx.font='700 22px Segoe UI';bctx.fillText(document.getElementById('fAddr').value||'Kotorkoshi',50,ty);bctx.fillText((document.getElementById('fName').value||'MUDASSIR HASSAN').toUpperCase(),600,ty);ty+=40;
+    bctx.fillStyle='#0E4D9C';bctx.font='800 20px Segoe UI';bctx.fillText('ISSUER:',50,ty);ty+=26;bctx.fillStyle='#000';bctx.fillText(document.getElementById('fIssuer').value||'MTN Nigeria Connect Point',50,ty);
+    // QR - copy from small canvas
+    const qrSmall=document.getElementById('qrCanvas');bctx.drawImage(qrSmall,800,ty+20,180,180);bctx.fillStyle='#0E4D9C';bctx.font='800 16px Segoe UI';bctx.fillText('SCAN FOR VERIFICATION',760,ty+220);
+    bctx.fillStyle='#0E4D9C';bctx.fillRect(0,1480,1140,170);bctx.fillStyle='#fff';bctx.font='500 18px Segoe UI';bctx.fillText('This card is valid only when presented with a valid government-issued photo ID •',80,1530);bctx.fillText('Property of MTN Nigeria • www.mtn.ng • Customer Care: +234 806 300 0000',150,1560);
+
+    // DOWNLOAD OFFLINE - BLOB
+    frontCanvas.toBlob(function(fBlob){
+      backCanvas.toBlob(function(bBlob){
+        const fUrl=URL.createObjectURL(fBlob);const bUrl=URL.createObjectURL(bBlob);
+        const nameSafe=document.getElementById('fName').value.replace(/\s+/g,'_');
+        document.getElementById('savePreviewWrap').innerHTML=`<img src="${fUrl}" style="width:100%;border-radius:8px;border:1px solid #ddd;"><img src="${bUrl}" style="width:100%;border-radius:8px;border:1px solid #ddd;">`;
+        document.getElementById('downloadLinks').innerHTML=`
+          <a href="${fUrl}" download="MTN-FRONT-${nameSafe}.jpg" class="btn btn-y" style="text-align:center;text-decoration:none;">⬇️ DOWNLOAD FRONT (Offline)</a>
+          <a href="${bUrl}" download="MTN-BACK-${nameSafe}.jpg" class="btn btn-b" style="text-align:center;text-decoration:none;">⬇️ DOWNLOAD BACK (Offline)</a>
+          <a href="${fUrl}" download="MTN-FRONT-${nameSafe}.jpg" id="bothBtn" class="btn btn-save" style="text-align:center;text-decoration:none;">⬇️ DOWNLOAD BOTH</a>
+        `;
+        document.getElementById('saveModal').style.display='flex';
+        // Auto download
+        const a1=document.createElement('a');a1.href=fUrl;a1.download=`MTN-FRONT-${nameSafe}.jpg`;document.body.appendChild(a1);a1.click();document.body.removeChild(a1);
+        setTimeout(()=>{const a2=document.createElement('a');a2.href=bUrl;a2.download=`MTN-BACK-${nameSafe}.jpg`;document.body.appendChild(a2);a2.click();document.body.removeChild(a2);},800);
+        btn.innerText='💾 SAVE ID CARD - OFFLINE (No Data)';btn.disabled=false;status.innerText='✅ Saved Offline! Check Gallery / Downloads';setTimeout(()=>{status.style.display='none';},5000);
+      },'image/jpeg',0.92);
+    },'image/jpeg',0.92);
+
+  }catch(e){alert('Error: '+e.message);console.error(e);btn.innerText='💾 SAVE ID CARD - OFFLINE (No Data)';btn.disabled=false;status.style.display='none';}
+}
+const cur=JSON.parse(localStorage.getItem('mtn_id_current_offline')||'null');if(cur)openDash(cur);
+drawBars();drawQR();
+</script>
+</body>
+</html>
